@@ -1,0 +1,244 @@
+class LibyanMarioGame {
+    constructor() {
+        // Game stats
+        this.score = 0;
+        this.lives = 3;
+        this.level = 1;
+
+        // Player object
+        this.player = {
+            x: 50,
+            y: 300,
+            width: 50,
+            height: 50,
+            velocityX: 0,
+            velocityY: 0,
+            jumpPower: 15,
+            grounded: false
+        };
+
+        // Coins array (example placeholder)
+        this.coins = [
+            { x: 200, y: 350, width: 20, height: 20, collected: false },
+            { x: 400, y: 300, width: 20, height: 20, collected: false }
+        ];
+
+        // Enemies array (example placeholder)
+        this.enemies = [
+            { x: 300, y: 350, width: 40, height: 40 },
+            { x: 500, y: 320, width: 40, height: 40 }
+        ];
+
+        // Keys pressed
+        this.keys = {};
+
+        // AI feedback system
+        this.aiMessages = [
+            "Welcome to Libya! Let's explore together! 🌟",
+            "Great jump! You're getting the hang of it! 🎮",
+            "Collect the golden coins - they represent Libyan hospitality! 💰",
+            "Watch out for the desert obstacles! 🌵",
+            "Amazing! You're learning about Libyan culture! 🇱🇾",
+            "Try again! Every attempt teaches us something new! 💪",
+            "You're doing fantastic! Keep exploring! ⭐",
+            "The traditional outfit looks great on you! 👕",
+            "Jump over the cacti - they're part of our desert landscape! 🌵",
+            "You're almost at the end! Don't give up! 🏁"
+        ];
+        this.currentAIMessage = 0;
+
+        // Sound effects
+        this.audioContext = null;
+        this.sounds = {};
+
+        // Initialize game
+        this.initAudio();
+        this.initializeLevel();
+        this.setupEventListeners();
+        this.updateAIFeedback();
+    }
+
+    // Update UI stats
+    updateUI() {
+        document.getElementById('score').textContent = this.score;
+        document.getElementById('lives').textContent = this.lives;
+        document.getElementById('level').textContent = this.level;
+    }
+
+    // Initialize audio system
+    initAudio() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.createSounds();
+        } catch (e) {
+            console.log('Audio not supported');
+        }
+    }
+
+    // Create simple beep sounds
+    createSounds() {
+        // Jump sound
+        this.sounds.jump = () => {
+            if (!this.audioContext) return;
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            oscillator.frequency.setValueAtTime(400, this.audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(800, this.audioContext.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+            oscillator.start(this.audioContext.currentTime);
+            oscillator.stop(this.audioContext.currentTime + 0.1);
+        };
+
+        // Coin sound
+        this.sounds.coin = () => {
+            if (!this.audioContext) return;
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1200, this.audioContext.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+            oscillator.start(this.audioContext.currentTime);
+            oscillator.stop(this.audioContext.currentTime + 0.2);
+        };
+
+        // Defeat sound
+        this.sounds.defeat = () => {
+            if (!this.audioContext) return;
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+            oscillator.start(this.audioContext.currentTime);
+            oscillator.stop(this.audioContext.currentTime + 0.3);
+        };
+    }
+
+    // Play sound by name
+    playSound(soundName) {
+        if (this.sounds[soundName]) {
+            try {
+                this.sounds[soundName]();
+            } catch (e) {
+                console.log('Sound playback failed:', e);
+            }
+        }
+    }
+
+    // Initialize level (placeholder)
+    initializeLevel() {
+        this.updateUI();
+    }
+
+    // Update AI feedback message
+    updateAIFeedback(message) {
+        if (message) {
+            document.getElementById('feedbackText').textContent = message;
+        } else {
+            document.getElementById('feedbackText').textContent = this.aiMessages[this.currentAIMessage];
+            this.currentAIMessage = (this.currentAIMessage + 1) % this.aiMessages.length;
+        }
+    }
+
+    // Rect collision helper
+    rectIntersect(a, b) {
+        return (
+            a.x < b.x + b.width &&
+            a.x + a.width > b.x &&
+            a.y < b.y + b.height &&
+            a.y + a.height > b.y
+        );
+    }
+
+    // Setup keyboard events
+    setupEventListeners() {
+        window.addEventListener('keydown', (e) => { 
+            this.keys[e.code] = true; 
+            this.handlePlayerActions(); 
+        });
+        window.addEventListener('keyup', (e) => { this.keys[e.code] = false; });
+    }
+
+    // Handle player actions (jump, coin collection, enemy collision)
+    handlePlayerActions() {
+        // Jumping
+        if ((this.keys['ArrowUp'] || this.keys['KeyW'] || this.keys['Space']) && this.player.grounded) {
+            this.player.velocityY = -this.player.jumpPower;
+            this.player.grounded = false;
+            this.playSound('jump');
+            this.updateAIFeedback("Nice jump! Keep going! 🦘");
+        }
+
+        // Coin collection
+        for (let coin of this.coins) {
+            if (!coin.collected && this.rectIntersect(this.player, coin)) {
+                coin.collected = true;
+                this.score += 10;
+                this.playSound('coin');
+                this.updateUI();
+                this.updateAIFeedback("Great! You found a golden coin! ✨");
+            }
+        }
+
+        // Enemy collision
+        for (let enemy of this.enemies) {
+            if (this.rectIntersect(this.player, enemy)) {
+                if (this.player.velocityY > 0) { // Falling on enemy
+                    // Defeat enemy
+                    this.enemies = this.enemies.filter(e => e !== enemy);
+                    this.score += 20;
+                    this.player.velocityY = -8; // Bounce
+                    this.playSound('coin'); // reuse coin sound
+                    this.updateAIFeedback("Excellent! You defeated the desert creature! 🎯");
+                } else {
+                    // Player hit by enemy
+                    this.playSound('defeat');
+                    this.loseLife();
+                }
+            }
+        }
+    }
+
+    // Lose life
+    loseLife() {
+        this.lives--;
+        this.updateUI();
+        this.playSound('defeat');
+
+        if (this.lives <= 0) {
+            this.gameOver();
+        } else {
+            // Reset player position
+            this.player.x = 100;
+            this.player.y = 200;
+            this.player.velocityX = 0;
+            this.player.velocityY = 0;
+            this.updateAIFeedback("Ouch! Be more careful next time! 💔");
+        }
+    }
+
+    // Placeholder game over
+    gameOver() {
+        alert("Game Over! Try again!");
+        this.lives = 3;
+        this.score = 0;
+        this.player.x = 50;
+        this.player.y = 300;
+        this.enemies = [];
+        this.coins = [];
+        this.updateUI();
+        this.updateAIFeedback("Welcome back! Let's try again! 🌟");
+    }
+}
+
+// Start the game
+const game = new LibyanMarioGame();
