@@ -1,0 +1,169 @@
+game-button:active {
+    transform: translateY(0);
+}
+
+.ai-feedback {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 50;
+    max-width: 300px;
+}
+
+.feedback-bubble {
+    background: var(--libyan-white);
+    border: 3px solid var(--libyan-gold);
+    border-radius: 20px;
+    padding: 15px 20px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: bounce 2s infinite;
+}
+
+.feedback-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    right: 30px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid var(--libyan-gold);
+}
+
+.feedback-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    right: 30px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid var(--libyan-white);
+}
+
+#feedbackText {
+    color: var(--libyan-black);
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.4;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Desert theme elements */
+.desert-sun {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, var(--libyan-gold) 0%, var(--libyan-orange) 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--libyan-gold);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .game-container {
+        height: 100vh;
+        border-radius: 0;
+    }
+    
+    .game-header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    .game-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .game-stats {
+        gap: 15px;
+    }
+    
+    #gameCanvas {
+        width: 100%;
+        height: auto;
+        max-width: 350px;
+        max-height: 250px;
+    }
+    
+    .overlay-content {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .ai-feedback {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* Game elements styling */
+.platform {
+    fill: var(--platform-brown);
+    stroke: #654321;
+    stroke-width: 2;
+}
+
+.cactus {
+    fill: var(--cactus-green);
+    stroke: #1F5F1F;
+    stroke-width: 1;
+}
+
+.coin {
+    fill: var(--libyan-gold);
+    stroke: var(--libyan-orange);
+    stroke-width: 2;
+}
+
+.enemy {
+    fill: var(--libyan-red);
+    stroke: var(--libyan-black);
+    stroke-width: 1;
+}
+
+/* Hidden state */
+.hidden {
+    display: none !important;
+}
+
+/* Success and failure animations */
+.success {
+    animation: successPulse 0.6s ease-in-out;
+}
+
+.failure {
+    animation: failureShake 0.5s ease-in-out;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes failureShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
