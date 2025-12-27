@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libyan Mario - Cultural Platformer Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>🇱🇾 Libyan Mario 🇱🇾</h1>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Score:</span>
+                    <span id="score" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Lives:</span>
+                    <span id="lives" class="stat-value">3</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Level:</span>
+                    <span id="level" class="stat-value">1</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="game-area">
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+            
+            <div class="game-overlay" id="gameOverlay">
+                <div class="overlay-content">
+                    <h2 id="overlayTitle">Welcome to Libyan Mario!</h2>
+                    <p id="overlayMessage">Help Libyan Mario navigate through the desert platform world!</p>
+                    <div class="controls-info">
+                        <h3>Controls:</h3>
+                        <p>← → Arrow keys to move</p>
+                        <p>↑ Arrow key or SPACE to jump</p>
+                    </div>
+                    <button id="startButton" class="game-button">Start Game</button>
+                    <button id="restartButton" class="game-button" style="display: none;">Play Again</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ai-feedback" id="aiFeedback">
+            <div class="feedback-bubble">
+                <p id="feedbackText">Welcome! Let's explore Libyan culture together! 🌟</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/game.js"></script>
+</body>
+</html>
